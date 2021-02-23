@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const fs = require('fs')
+const { send } = require('process')
 const uuid = require('uuid')
 const notes = require('../../db/db.json')
 
@@ -26,16 +27,16 @@ router.post('/', (req, res) => {
 })
 
 //delete note
-router.delete('/:id', (req, res) => {
-  const found = notes.some((note) => note.id === req.params.id)
-  if (!found) res.status(404).json({ msg: `No note with id ${req.params.id}` })
-
-  const index = notes.indexOf(found)
+router.delete('/:id', (req, res, ext) => {
+  const { id } = req.params
+  const index = notes.findIndex((note) => note.id == id)
   notes.splice(index, 1)
+  console.log(notes)
+
   fs.writeFile('db/db.json', JSON.stringify(notes), (err) => {
     if (err) throw err
   })
-  res.send(notes)
+  return res.send()
 })
 
 module.exports = router
